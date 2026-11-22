@@ -2,6 +2,7 @@ extends "res://scripts/rules_base.gd"
 
 const COLS := 9
 const ROWS := 5
+const BALL_RADIUS := 0.021
 var bricks: Array[bool] = []
 var ball := Vector2(0.5, 0.7)
 var velocity := Vector2(0.37, -0.48)
@@ -69,18 +70,31 @@ func _advance(dt: float) -> void:
 			ended = true
 			message = "Fim de jogo"
 		return
-	if ball.y >= 0.1 and ball.y < 0.48:
-		var bx := int(floor(ball.x * COLS))
-		var by := int(floor((ball.y - 0.1) / 0.076))
-		if bx >= 0 and bx < COLS and by >= 0 and by < ROWS:
-			var index := by * COLS + bx
-			if bricks[index]:
+	if ball.y >= 0.1 - BALL_RADIUS and ball.y < 0.48 + BALL_RADIUS:
+		var hit := false
+		for row in range(ROWS):
+			for col in range(COLS):
+				var index := row * COLS + col
+				if not bricks[index]:
+					continue
+				# Mesma geometria do desenho: não acertar o espaço entre tijolos.
+				var brick := Rect2(Vector2(float(col) / COLS + 3.0 / 632.0, 0.1 + row * 0.076), Vector2(1.0 / COLS - 6.0 / 632.0, 0.065))
+				var nearest := ball.clamp(brick.position, brick.end)
+				if ball.distance_squared_to(nearest) > BALL_RADIUS * BALL_RADIUS:
+					continue
 				bricks[index] = false
 				score += 10
-				velocity.y = -velocity.y
+				if ball.x < brick.position.x or ball.x > brick.end.x:
+					velocity.x = -velocity.x
+				else:
+					velocity.y = -velocity.y
+				hit = true
 				if not bricks.has(true):
 					ended = true
 					message = "Todos os blocos!"
+				break
+			if hit:
+				break
 
 
 func draw_game(canvas: CanvasItem, area: Rect2) -> void:

@@ -31,6 +31,14 @@ func _initialize() -> void:
 	game.velocity = Vector2(0, 0.5)
 	game._advance(0.02)
 	check(game.lives == 2, "bola perdida remove vida")
+	game.reset()
+	game.ball = Vector2(0.5, 0.07)
+	game.velocity = Vector2.ZERO
+	game._advance(0.0)
+	check(game.bricks.count(false) == 0, "bola distante não destrói bloco")
+	game.ball = Vector2(0.50, 0.09)
+	game._advance(0.0)
+	check(game.bricks.count(false) == 1, "borda da bola encosta no tijolo")
 	finish()
 
 
