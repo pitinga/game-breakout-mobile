@@ -56,7 +56,7 @@ func _advance(dt: float) -> void:
 	if ball.y < 0.025:
 		ball.y = 0.025
 		velocity.y = absf(velocity.y)
-	if velocity.y > 0 and ball.y >= 0.91 and ball.y < 0.95 and absf(ball.x - paddle) < 0.14:
+	if velocity.y > 0 and ball.y >= 0.91 and ball.y < 0.95 and absf(ball.x - paddle) <= 0.14:
 		ball.y = 0.91
 		velocity.y = -absf(velocity.y)
 		velocity.x = (ball.x - paddle) * 3.1
@@ -69,7 +69,7 @@ func _advance(dt: float) -> void:
 			ended = true
 			message = "Fim de jogo"
 		return
-	if ball.y > 0.1 and ball.y < 0.48:
+	if ball.y >= 0.1 and ball.y < 0.48:
 		var bx := int(floor(ball.x * COLS))
 		var by := int(floor((ball.y - 0.1) / 0.076))
 		if bx >= 0 and bx < COLS and by >= 0 and by < ROWS:
