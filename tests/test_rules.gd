@@ -39,6 +39,26 @@ func _initialize() -> void:
 	game.ball = Vector2(0.50, 0.09)
 	game._advance(0.0)
 	check(game.bricks.count(false) == 1, "borda da bola encosta no tijolo")
+	# A geometria dos alvos vem das mesmas formas usadas no draw_game.
+	var brick: Rect2 = game._brick_rect(4, 0)
+	var half_y := brick.position.y + brick.size.y * 0.5
+	game.ball = Vector2(brick.position.x - (game.BALL_RADIUS - 0.01) / game.FIELD_SIZE.x, half_y)
+	check(game._ball_hits_rect(brick), "tangência lateral na face desenhada do tijolo")
+	game.ball.x -= 0.2 / game.FIELD_SIZE.x
+	check(not game._ball_hits_rect(brick), "0,2 px fora da face não acerta tijolo")
+	game.ball = Vector2(brick.position.x + brick.size.x * 0.5, brick.position.y - (game.BALL_RADIUS - 0.01) / game.FIELD_SIZE.y)
+	check(game._ball_hits_rect(brick), "tangência superior no tijolo respeita altura real")
+	game.ball = brick.position - Vector2(9.3 / game.FIELD_SIZE.x, 9.3 / game.FIELD_SIZE.y)
+	check(not game._ball_hits_rect(brick), "canto diagonal a 13,15 px não gera colisão prematura")
+	game.ball = brick.position - Vector2(9.0 / game.FIELD_SIZE.x, 9.0 / game.FIELD_SIZE.y)
+	check(game._ball_hits_rect(brick), "canto diagonal a 12,73 px entra no raio visível")
+	game.paddle = 0.5
+	var paddle_rect: Rect2 = game._paddle_rect()
+	check(is_equal_approx(paddle_rect.position.y, 0.93) and is_equal_approx(paddle_rect.size.y * game.FIELD_SIZE.y, 18.0), "raquete compartilha posição e altura entre física e desenho")
+	game.ball = Vector2(0.5, paddle_rect.position.y - game.BALL_RADIUS / game.FIELD_SIZE.y)
+	check(game._ball_hits_rect(paddle_rect), "bola toca exatamente o topo visível da raquete")
+	game.ball.y -= 0.2 / game.FIELD_SIZE.y
+	check(not game._ball_hits_rect(paddle_rect), "espaço de 0,2 px acima da raquete não rebate")
 	finish()
 
 
